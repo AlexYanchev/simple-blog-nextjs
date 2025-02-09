@@ -1,12 +1,17 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { FC, ReactNode } from 'react';
 
-const ButtonBack = () => {
+interface ButtonBackProps {
+  children: ReactNode;
+}
+
+const ButtonBack: FC<ButtonBackProps> = ({ children }) => {
   const router = useRouter();
   return (
     <button type='button' onClick={() => router.back()}>
-      &larr; Назад
+      {children}
     </button>
   );
 };
