@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-const posts = [
+export const posts = [
   {
     id: 1,
     title: 'Как работает Next.js?',
