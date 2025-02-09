@@ -10,8 +10,13 @@ export interface I_ResponseComment {
   findedComments: I_Comment[];
 }
 
-export const comments: { lastId: number; data: Record<string, I_Comment[]> } = {
+export const comments: {
+  lastId: number;
+  data: Record<string, I_Comment[]>;
+  lastComments: I_Comment[];
+} = {
   lastId: 3,
+  lastComments: [],
   data: {
     '1': [{ id: 1, postId: 1, text: 'Комментарий к посту 1' }],
     '2': [{ id: 2, postId: 2, text: 'Комментарий к посту 2' }],
@@ -52,6 +57,7 @@ export async function POST(req: NextRequest) {
   const { postId, text } = body;
   const id = ++comments.lastId;
   const newComment = { id, postId: Number(postId), text };
+  comments.lastComments = [newComment, ...comments.lastComments].slice(0, 15);
   comments.data[postId] = [newComment, ...comments.data[postId]];
 
   return NextResponse.json({
