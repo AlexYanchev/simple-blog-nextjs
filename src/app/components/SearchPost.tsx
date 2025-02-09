@@ -1,51 +1,56 @@
 'use client';
-import { posts } from '@/pages/Home';
-import { ChangeEvent, FC, useState } from 'react';
-import Link from 'next/link';
+
+import { useSearchParams } from 'next/navigation';
+import { ChangeEvent, FC, useEffect, useState } from 'react';
+import type { Post } from '@/pages/Home';
 
 interface SearchPostProps {
-  classNameContainer: string;
+  classNameContainer?: string;
 }
 
-const SearchPost: FC<SearchPostProps> = ({ classNameContainer }) => {
-  const [findedPosts, setFindedPosts] = useState<typeof posts | null>(null);
-  const [searchValue, setSearchValue] = useState<string>('');
+const SearchPost: FC<SearchPostProps> = ({ classNameContainer = '' }) => {
+  const searchParams = useSearchParams();
+  //   const router = useRouter();
+  const [searchValue, setSearchValue] = useState(
+    searchParams.get('search') || ''
+  );
+  const [findedPosts, setFindedPosts] = useState<Post[]>([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const res = await fetch(`/api/posts?search=${searchValue}`);
+      const data: Post[] = await res.json();
+      setFindedPosts(data);
+    };
+
+    if (searchValue) {
+      fetchPosts();
+    } else {
+      setFindedPosts([]);
+    }
+  }, [searchValue]);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.currentTarget.value;
+    const value = e.target.value;
     setSearchValue(value);
-
-    if (!Boolean(value)) {
-      setFindedPosts(null);
-      return;
-    }
-
-    const findedPosts = posts.filter((post) => post.title.startsWith(value));
-    setFindedPosts(findedPosts);
+    // router.replace(`/posts?search=${value}`);
   };
-
-  const renderFindedPosts =
-    findedPosts && findedPosts.length ? (
-      <ul>
-        {findedPosts.map((post) => (
-          <li key={post.id}>
-            <Link href={`/post/${post.id}`}>{post.title}</Link>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p>Посты не найдены</p>
-    );
 
   return (
     <div className={classNameContainer}>
       <input
         type='search'
-        onChange={onChange}
         value={searchValue}
+        onChange={onChange}
         className='border-2 w-full'
       />
-      {findedPosts && renderFindedPosts}
+      {findedPosts.length > 0 && (
+        <ul>
+          {findedPosts.map((post) => (
+            <li key={post.id}>{post.title}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

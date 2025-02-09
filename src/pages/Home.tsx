@@ -1,6 +1,12 @@
 import Link from 'next/link';
 
-export const posts = [
+export interface Post {
+  id: number;
+  title: string;
+  excerpt: string;
+}
+
+export const posts: Post[] = [
   {
     id: 1,
     title: 'Как работает Next.js?',
@@ -22,6 +28,7 @@ export default function Home() {
   return (
     <div className='max-w-3xl mx-auto p-4'>
       <h1 className='text-3xl font-bold mb-4'>Блог</h1>
+
       <ul className='space-y-4'>
         {posts.map((post) => (
           <li key={post.id} className='p-4 border rounded-lg shadow'>
